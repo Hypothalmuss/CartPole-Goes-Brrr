@@ -6,13 +6,15 @@ venv/
 venv_mingw/
 
 # training outputs (checkpoints, tensorboard logs, VecNormalize stats)
-balance/output/
+balance_1_link/output/
+balance_2_links/output/
 crawl/output/
 
 # markdown (except READMEs)
 *.md
 !README.md
-!balance/README.md
+!balance_1_link/README.md
+!balance_2_links/README.md
 !crawl/README.md
 
 .DS_Store
