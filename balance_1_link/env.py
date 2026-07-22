@@ -37,7 +37,7 @@ class SinglePendulumCartEnv(gym.Env):
         self.R_CART_POS = -0.5
         self.R_CART_VEL = -0.005
         self.R_POLE_VEL = -0.05
-        self.R_CONTROL = -0.03
+        self.R_CONTROL = -0.01
         self.R_JERK = -0.005
 
         # Limits

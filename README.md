@@ -17,6 +17,10 @@ throwing PPO at it and hoping the math gods smile upon us.
 The textbook cartpole. One link, one rail, one job: stay upright.
 If it falls, you know exactly who to blame.
 
+**Results:** 90% success rate (18/20 episodes survive the full 500 steps).
+Mean |action| ~1.5N during balance, up to ~9N during recovery. No rail limit
+violations. Trained with PPO for 999K timesteps.
+
 **What you learn here:** reward shaping, why a survival bonus is a dangerously
 addictive crutch, and that even the "hello world" of RL can humiliate you.
 
@@ -44,11 +48,11 @@ cart forward like an inchworm having an existential crisis.
 of crawl, and that making links touch the ground in PyBullet is harder than it
 sounds.
 
-| Task | Folder | Objective | Action space |
-|------|--------|-----------|---------------|
-| **Balance (1L)** | [`balance_1_link/`](balance_1_link) | Keep the pole upright on a rail | 1D force on cart |
-| **Balance (2L)** | [`balance_2_links/`](balance_2_links) | Keep the double pendulum upright | 1D force on cart |
-| **Crawl** | [`crawl/`](crawl) | Use joint torque to drag the cart forward | 2D torque `[hip, elbow]` |
+| Task | Folder | Objective | Action space | Success rate | Timesteps |
+|------|--------|-----------|---------------|:------------:|:---------:|
+| **Balance (1L)** | [`balance_1_link/`](balance_1_link) | Keep the pole upright on a rail | 1D force [-25, 25] N | **90%** | 999K |
+| **Balance (2L)** | [`balance_2_links/`](balance_2_links) | Keep the double pendulum upright | 1D force [-25, 25] N | — (WIP) | 999K |
+| **Crawl** | [`crawl/`](crawl) | Use joint torque to drag the cart forward | 2D torque `[hip, elbow]` | — (WIP) | 1M |
 
 ## Structure
 

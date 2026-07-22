@@ -7,12 +7,15 @@ A single-pendulum-on-rail balance task, adapted from the two-link version.
 | Spec | Value |
 |------|-------|
 | URDF | `cartpole_single.urdf` — cart (1kg) + one link (0.5kg, 1.0m) |
-| Action | 1D continuous force [-50, 50] N on cart |
+| Action | 1D continuous force [-25, 25] N on cart |
 | Observation | 4 values: `[cart_pos, cart_vel, pole_angle, pole_angvel]` |
 | Reward | cos(pole_angle) + survival + penalties (pos, vel, control) + settled bonus |
 | Termination | Rail limit > 2.4m OR pole angle > 86deg |
 | Max steps | 500 |
 | Curriculum | 30% of episodes start with pole velocity up to ±4 rad/s |
+| Training | PPO, 999K timesteps, 3e-4 LR |
+| Success rate | **90%** (18/20 episodes) |
+| Mean |action| | ~1.5 N (steady) / ~9 N (recovery) |
 
 ## Usage
 
