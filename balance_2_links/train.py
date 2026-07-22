@@ -21,7 +21,7 @@ from env import DoublePendulumCartEnv
 # ------------------------------------------------------------------ #
 #  Hyperparameters — tweak these to experiment                       #
 # ------------------------------------------------------------------ #
-TIMESTEPS = 200_000          # total timesteps
+TIMESTEPS = 999_000          # total timesteps
 LEARNING_RATE = 3e-4         # Adam lr
 GAMMA = 0.99                 # discount factor
 GAE_LAMBDA = 0.95            # GAE smoothing

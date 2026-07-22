@@ -1,6 +1,6 @@
 # Balance — Single Link
 
-![Standing Demo](standing.gif)
+![Finally Standing Demo](finally-standing.gif)
 
 A single-pendulum-on-rail balance task, adapted from the two-link version.
 

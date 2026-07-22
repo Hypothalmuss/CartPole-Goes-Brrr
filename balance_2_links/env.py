@@ -38,7 +38,7 @@ class DoublePendulumCartEnv(gym.Env):
         # ------------------------------------------------------------------ #
         #  Action space: continuous 1D force on cart (positive = right)      #
         # ------------------------------------------------------------------ #
-        self.max_force = 50.0
+        self.max_force = 25.0
         self.action_space = spaces.Box(
             low=-self.max_force, high=self.max_force, shape=(1,), dtype=np.float32,
         )
@@ -56,11 +56,11 @@ class DoublePendulumCartEnv(gym.Env):
         self.R_HIP = 1.0          # uprightness of link1 (cos term)
         self.R_ELBOW = 1.0        # uprightness of link2 (cos term)
         self.R_SURVIVAL = 0.1     # small bonus every timestep
-        self.R_CART_POS = -0.05   # penalty for cart offset from center
+        self.R_CART_POS = -0.5    # penalty for cart offset from center
         self.R_CART_VEL = -0.005  # nearly zero — fast bursts to catch falls are good
         self.R_HIP_VEL = -0.05    # penalty for hip angular velocity
         self.R_ELBOW_VEL = -0.05  # penalty for elbow angular velocity
-        self.R_CONTROL = -0.01    # penalty for |action| (discourage large forces)
+        self.R_CONTROL = -0.03    # penalty for |action| (discourage large forces)
         self.R_JERK = -0.005      # light — prevents constant twitch without penalizing sharp saves
 
         # ------------------------------------------------------------------ #
