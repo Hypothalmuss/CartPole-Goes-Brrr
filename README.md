@@ -12,7 +12,7 @@ throwing PPO at it and hoping the math gods smile upon us.
 
 ### Task 1: Balance (single link — the classic)
 
-![Simple Balance Demo](balance_1_link/standing.gif)
+![Simple Balance Demo](balance_1_link/finally-standing.gif)
 
 The textbook cartpole. One link, one rail, one job: stay upright.
 If it falls, you know exactly who to blame.
