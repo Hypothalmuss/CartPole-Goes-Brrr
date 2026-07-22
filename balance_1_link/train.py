@@ -10,7 +10,7 @@ from stable_baselines3.common.vec_env import DummyVecEnv, VecNormalize
 from env import SinglePendulumCartEnv
 
 
-TIMESTEPS = 200_000
+TIMESTEPS = 999_000
 LEARNING_RATE = 3e-4
 GAMMA = 0.99
 GAE_LAMBDA = 0.95

@@ -22,7 +22,7 @@ class SinglePendulumCartEnv(gym.Env):
         self.max_episode_steps = max_episode_steps
         self.step_count = 0
 
-        self.max_force = 50.0
+        self.max_force = 25.0
         self.action_space = spaces.Box(
             low=-self.max_force, high=self.max_force, shape=(1,), dtype=np.float32,
         )
@@ -34,10 +34,10 @@ class SinglePendulumCartEnv(gym.Env):
         # Reward weights
         self.R_UPRIGHT = 1.0
         self.R_SURVIVAL = 0.1
-        self.R_CART_POS = -0.05
+        self.R_CART_POS = -0.5
         self.R_CART_VEL = -0.005
         self.R_POLE_VEL = -0.05
-        self.R_CONTROL = -0.01
+        self.R_CONTROL = -0.03
         self.R_JERK = -0.005
 
         # Limits
