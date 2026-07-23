@@ -55,13 +55,13 @@ class DoublePendulumCartEnv(gym.Env):
         # ------------------------------------------------------------------ #
         self.R_HIP = 1.0          # uprightness of link1 (cos term)
         self.R_ELBOW = 1.0        # uprightness of link2 (cos term)
-        self.R_SURVIVAL = 0.1     # small bonus every timestep
+        self.R_SURVIVAL = 0.02    # small bonus every timestep
         self.R_CART_POS = -0.5    # penalty for cart offset from center
         self.R_CART_VEL = -0.005  # nearly zero — fast bursts to catch falls are good
-        self.R_HIP_VEL = -0.05    # penalty for hip angular velocity
-        self.R_ELBOW_VEL = -0.05  # penalty for elbow angular velocity
-        self.R_CONTROL = -0.03    # penalty for |action| (discourage large forces)
-        self.R_JERK = -0.005      # light — prevents constant twitch without penalizing sharp saves
+        self.R_CONTROL = -0.003   # penalty for |action| (discourage large forces)
+        self.R_JERK = -0.001      # light — prevents constant twitch without penalizing sharp saves
+        self.R_HIP_ACCEL = -0.005  # penalty for hip angular acceleration (velocity jerk)
+        self.R_ELBOW_ACCEL = -0.005
 
         # ------------------------------------------------------------------ #
         #  Physics & termination limits                                      #
@@ -85,6 +85,8 @@ class DoublePendulumCartEnv(gym.Env):
         self.joint_elbow = 2
 
         self.last_action = 0.0
+        self.prev_hip_vel_world = 0.0
+        self.prev_elbow_vel_world = 0.0
 
         self._setup_sim()
 
@@ -123,6 +125,8 @@ class DoublePendulumCartEnv(gym.Env):
         super().reset(seed=seed)
         self.step_count = 0
         self.last_action = 0.0
+        self.prev_hip_vel_world = 0.0
+        self.prev_elbow_vel_world = 0.0
 
         # Small random perturbation around the upright equilibrium
         # (not a hanging-down start — so the agent can't exploit a single lucky trajectory)
@@ -136,8 +140,8 @@ class DoublePendulumCartEnv(gym.Env):
         # Curriculum: 30% of episodes start with real angular velocity already
         # present, matching the regime where recovery currently fails (hip_vel ~2.5-4.0).
         if self.np_random.random() < self.CURRICULUM_FALLING_START_PROB:
-            hip_vel_init = self.np_random.uniform(-4.0, 4.0)
-            elbow_vel_init = self.np_random.uniform(-2.0, 2.0)
+            hip_vel_init = self.np_random.uniform(-2.5, 2.5)
+            elbow_vel_init = self.np_random.uniform(-1.5, 1.5)
 
         p.resetJointState(self.cart_body, self.joint_rail, targetValue=rail_pos, targetVelocity=rail_vel)
         p.resetJointState(self.cart_body, self.joint_hip, targetValue=hip_angle_init, targetVelocity=hip_vel_init)
@@ -175,8 +179,6 @@ class DoublePendulumCartEnv(gym.Env):
         penalty = (
             abs(cart_pos * self.pos_scale) * self.R_CART_POS
             + abs(cart_vel * self.vel_scale) * self.R_CART_VEL
-            + abs(hip_vel * self.angvel_scale) * self.R_HIP_VEL
-            + abs(elbow_vel * self.angvel_scale) * self.R_ELBOW_VEL
             + abs(action) * self.R_CONTROL
             + abs(action - self.last_action) * self.R_JERK
         )
@@ -184,24 +186,26 @@ class DoublePendulumCartEnv(gym.Env):
         reward = uprightness + self.R_SURVIVAL + penalty
 
         # Quadratic urgency penalty: hip weighted more heavily.
-        # Previously equal: -0.3 * hip_deg**2 - 0.3 * elbow_deg**2
         hip_deg = hip_angle * self.angle_scale
         elbow_deg = elbow_angle * self.angle_scale
-        urgency_penalty = -0.4 * hip_deg**2 - 0.2 * elbow_deg**2
+        urgency_penalty = -0.4 * hip_deg**2 - 0.4 * elbow_deg**2
         reward += urgency_penalty
 
-        # Velocity urgency: quadratic hip_vel penalty sharpens recovery gradient
-        # at the moderate velocities where the policy currently freezes.
-        hip_vel_urgency = -0.15 * (hip_vel * self.angvel_scale) ** 2
-        reward += hip_vel_urgency
+        hip_vel_world = hip_vel * self.angvel_scale
+        elbow_vel_world = elbow_vel * self.angvel_scale
+
+        # Acceleration penalty: directly punish velocity jerk
+        d_hip_vel = hip_vel_world - self.prev_hip_vel_world
+        d_elbow_vel = elbow_vel_world - self.prev_elbow_vel_world
+        self.prev_hip_vel_world = hip_vel_world
+        self.prev_elbow_vel_world = elbow_vel_world
+        reward += abs(d_hip_vel) * self.R_HIP_ACCEL + abs(d_elbow_vel) * self.R_ELBOW_ACCEL
 
         # "Settled" bonus: only when both links are near-vertical AND slow.
-        # The dense cos reward is happy with near-vertical oscillation; this
-        # threshold bonus pushes the agent to actually converge at the top.
         if (abs(hip_angle * self.angle_scale) < 0.15
                 and abs(elbow_angle * self.angle_scale) < 0.15
-                and abs(hip_vel * self.angvel_scale) < 1.0
-                and abs(elbow_vel * self.angvel_scale) < 1.0):
+                and abs(hip_vel * self.angvel_scale) < 0.3
+                and abs(elbow_vel * self.angvel_scale) < 0.3):
             reward += 0.5
 
         # ---- termination ----
